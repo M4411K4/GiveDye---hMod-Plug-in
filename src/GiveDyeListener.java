@@ -6,11 +6,14 @@ public class GiveDyeListener extends PluginListener
 	private final String D = "/d";
 	private final String WOOL = "/wool";
 	private final String W = "/w";
+	private final String LOG = "/log";
+	private final String L = "/l";
 	private final String GIVE_DYE = "/givedye";
 	private final String GIVE_DYE_TO = "/givedyeto";
 	
 	private final int DYE_ID = 351;
 	private final int WOOL_ID = 35;
+	private final int LOG_ID = 17;
 	
 	private GiveDye dyePlugin;
 	private PropertiesFile[] properties;
@@ -38,7 +41,7 @@ public class GiveDyeListener extends PluginListener
 					return false;
 				}
 				
-				giveColor(player, DYE_ID, split, 0);
+				giveColor(player, DYE_ID, split, 15, 0);
 			}
 			else if(properties[1].getBoolean("allow-wool", true) && (split[0].equalsIgnoreCase(WOOL) || split[0].equalsIgnoreCase(W)) )
 			{
@@ -51,19 +54,34 @@ public class GiveDyeListener extends PluginListener
 					return false;
 				}
 				
-				giveColor(player, WOOL_ID, split, 1);
+				giveColor(player, WOOL_ID, split, 15, 1);
+			}
+			else if(properties[2].getBoolean("allow-log", true) && (split[0].equalsIgnoreCase(LOG) || split[0].equalsIgnoreCase(L)) )
+			{
+				if(split.length < 2)
+				{
+					if(player.canUseCommand(GIVE_DYE_TO))
+						player.sendMessage(Colors.Rose + "Correct usage is: /log [color_id] <amount> <player>");
+					else
+						player.sendMessage(Colors.Rose + "Correct usage is: /log [color_id] <amount>");
+					return false;
+				}
+				
+				giveColor(player, LOG_ID, split, 2, 2);
 			}
 			else if(split[0].equalsIgnoreCase(GIVE_DYE))
 			{
 				player.sendMessage(Colors.Rose + dyePlugin.NAME + " ver" + dyePlugin.VERSION+". [] = required <> = optional. Commands are:");
 				player.sendMessage(Colors.Rose + "/dye [color_id] <amount>");
 				player.sendMessage(Colors.Rose + "/wool [color_id] <amount>");
+				player.sendMessage(Colors.Rose + "/log [color_id] <amount>");
 			}
 			else if(player.canUseCommand(GIVE_DYE_TO) && split[0].equalsIgnoreCase(GIVE_DYE_TO))
 			{
 				player.sendMessage(Colors.Rose + dyePlugin.NAME + " ver" + dyePlugin.VERSION+". [] = required <> = optional. Commands are:");
 				player.sendMessage(Colors.Rose + "/dye [color_id] <amount> <player>");
 				player.sendMessage(Colors.Rose + "/wool [color_id] <amount> <player>");
+				player.sendMessage(Colors.Rose + "/log [color_id] <amount> <player>");
 			}
 			else
 			{
@@ -77,7 +95,7 @@ public class GiveDyeListener extends PluginListener
 	}
 	
 	//Mostly a copy of hMod Player and related code
-	private void giveColor(Player player, int id, String[] args, int prop)
+	private void giveColor(Player player, int id, String[] args, int max, int prop)
 	{
 		Player toGive = player;
 		if (args.length == 4 && player.canUseCommand(GIVE_DYE_TO))
@@ -106,7 +124,7 @@ public class GiveDyeListener extends PluginListener
 				}
 			}
 			
-			if(color < 0 || color > 15)
+			if(color < 0 || color > max)
 			{
 				player.sendMessage(Colors.Rose + "Improper color id.");
 				return;

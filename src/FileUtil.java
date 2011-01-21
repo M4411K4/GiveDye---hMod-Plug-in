@@ -11,6 +11,7 @@ public class FileUtil
 {
 	private static final String DYE_SETTINGS_PATH = "dyes.properties";
 	private static final String WOOL_SETTINGS_PATH = "wool.properties";
+	private static final String LOG_SETTINGS_PATH = "wood.properties";
 	
 	private static String getDyeDefault()
 	{
@@ -21,6 +22,7 @@ public class FileUtil
 		"#In-game commands will be:\r\n"+
 		"#/dye [color id or name] <amount> <player>\r\n"+
 		"#/wool [color id or name] <amount> <player>\r\n"+
+		"#/log [color id or name] <amount> <player>\r\n"+
 		"###################\r\n"+
 		"\r\n"+
 		"#Allow this plug-in to give out dyes? This applies to all players. If missing, this will be set to true. [default = true]\r\n"+
@@ -34,7 +36,7 @@ public class FileUtil
 		"#Dye Values:\r\n"+
 		"\r\n"+
 		"#Add the dye names you want followed by the color id number (0 to 15) to go with the name\r\n"+
-		"format: [dye_name]=[color_id]\r\n"+
+		"#format: [dye_name]=[color_id]\r\n"+
 		"#(same process as items.txt server file, but with '=' instead of ':')\r\n"+
 		"#You can remove any default dye names too. Removing a dye name will not remove the ability to get them.\r\n"+
 		"#Players with permissions will still be able to get dyes through typing in the color id number instead of the names.\r\n"+
@@ -74,6 +76,7 @@ public class FileUtil
 		"#In-game commands will be:\r\n"+
 		"#/dye [color id or name] <amount> <player>\r\n"+
 		"#/wool [color id or name] <amount> <player>\r\n"+
+		"#/log [color id or name] <amount> <player>\r\n"+
 		"###################\r\n"+
 		"\r\n"+
 		"#Allow this plug-in to give out wool? This applies to all players. If missing, this will be set to true. [default = true]\r\n"+
@@ -87,7 +90,7 @@ public class FileUtil
 		"#Wool Values:\r\n"+
 		"\r\n"+
 		"#Add the wool color names you want followed by the color id number (0 to 15) to go with the name\r\n"+
-		"format: [wool_name]=[color_id]\r\n"+
+		"#format: [wool_name]=[color_id]\r\n"+
 		"#(same process as items.txt server file, but with '=' instead of ':')\r\n"+
 		"#You can remove any default wool names too. Removing a wool name will not remove the ability to get them.\r\n"+
 		"#Players with permissions will still be able to get colored wool through typing in the color id number instead of the names.\r\n"+
@@ -118,12 +121,53 @@ public class FileUtil
 		return output;
 	}
 	
+	private static String getLogDefault()
+	{
+		String output = ""+
+		
+		"#To allow players to use this plug-in you must add the /givedye command to groups in the groups.txt server file.\r\n"+
+		"#If you want to allow a group to give other players dyes or wool, add the /givedyeto command to the group. \r\n"+
+		"#In-game commands will be:\r\n"+
+		"#/dye [color id or name] <amount> <player>\r\n"+
+		"#/wool [color id or name] <amount> <player>\r\n"+
+		"#/log [color id or name] <amount> <player>\r\n"+
+		"###################\r\n"+
+		"\r\n"+
+		"#Allow this plug-in to give out logs? This applies to all players. If missing, this will be set to true. [default = true]\r\n"+
+		"allow-log=true\r\n"+
+		"\r\n"+
+		"#Display server log messages when players get or give log? If missing, this will be set to true. [default = true]\r\n"+
+		"log-giving=true\r\n"+
+		"\r\n"+
+		"###################\r\n"+
+		"\r\n"+
+		"#Log Values:\r\n"+
+		"\r\n"+
+		"#Add the log color names you want followed by the color id number (0 to 2) to go with the name\r\n"+
+		"#format: [log_name]=[color_id]\r\n"+
+		"#(same process as items.txt server file, but with '=' instead of ':')\r\n"+
+		"#You can remove any default log names too. Removing a log name will not remove the ability to get them.\r\n"+
+		"#Players with permissions will still be able to get different logs through typing in the color id number instead of the names.\r\n"+
+		"\r\n"+
+		"#NO SPACES IN THE NAMES!\r\n"+
+		"\r\n"+
+		
+		"normal=0\r\n"+
+		"redwood=1\r\n"+
+		"birch=2\r\n"+
+		
+		"";
+		
+		return output;
+	}
+	
 	public static PropertiesFile[] loadSettings()
 	{
-		PropertiesFile[] props = new PropertiesFile[2];
+		PropertiesFile[] props = new PropertiesFile[3];
 		
 		props[0] = loadSetting(DYE_SETTINGS_PATH, getDyeDefault());
 		props[1] = loadSetting(WOOL_SETTINGS_PATH, getWoolDefault());
+		props[2] = loadSetting(LOG_SETTINGS_PATH, getLogDefault());
 		
 		return props;
 	}
