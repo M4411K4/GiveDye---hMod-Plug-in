@@ -10,10 +10,12 @@ public class GiveDyeListener extends PluginListener
 	private final String L = "/l";
 	private final String GIVE_DYE = "/givedye";
 	private final String GIVE_DYE_TO = "/givedyeto";
+	private final String SHEEP = "/sheep";
 	
 	private final int DYE_ID = 351;
 	private final int WOOL_ID = 35;
 	private final int LOG_ID = 17;
+	private final int LEAF_ID = 18;
 	
 	private GiveDye dyePlugin;
 	private PropertiesFile[] properties;
@@ -28,7 +30,19 @@ public class GiveDyeListener extends PluginListener
 	
 	public boolean onCommand(Player player, String[] split)
 	{
-		if(player.canUseCommand(GIVE_DYE) || player.canUseCommand(GIVE_DYE_TO))
+		if(split[0].equalsIgnoreCase(SHEEP) && player.canUseCommand(SHEEP))
+		{
+			if(split.length < 2)
+			{
+				player.sendMessage(Colors.Rose + "Correct usage is: /sheep [color_id] <amount>");
+				return false;
+			}
+			
+			spawnSheep(player, split, 15, 1);
+			
+			return true;
+		}
+		else if(player.canUseCommand(GIVE_DYE) || player.canUseCommand(GIVE_DYE_TO))
 		{
 			if(properties[0].getBoolean("allow-dye", true) && (split[0].equalsIgnoreCase(DYE) || split[0].equalsIgnoreCase(D)) )
 			{
@@ -92,6 +106,32 @@ public class GiveDyeListener extends PluginListener
 		}
 		
 		return false;
+	}
+	
+	public boolean onBlockDestroy(Player player, Block block) 
+	{
+		setLeaf(player, block, 2);
+		
+		return false;
+	}
+	
+	public void onBlockRightClicked(Player player, Block blockClicked, Item item)
+	{
+		setLeaf(player, blockClicked, 1);
+	}
+	
+	private void setLeaf(Player player, Block block, int leafType)
+	{
+		if(block.getType() != LEAF_ID || (!player.canUseCommand(GIVE_DYE) && !player.canUseCommand(GIVE_DYE_TO)) )
+			return;
+		
+		int tool = properties[2].getInt("leaf-tool", -1);
+		int itemId = player.getItemInHand();
+		
+		if(tool < 0 || itemId != tool)
+			return;
+		
+		etc.getServer().setBlockData(block.getX(), block.getY(), block.getZ(), leafType);
 	}
 	
 	//Mostly a copy of hMod Player and related code
@@ -243,10 +283,9 @@ public class GiveDyeListener extends PluginListener
 	
 	private void giveItemDrop(Player player, int itemId, int amount, int color)
 	{
-		fy entity = player.getEntity();
 		if(amount == -1)
 		{
-			entity.a(new jl(itemId, 255, color));
+			setEntity(player.getEntity(), itemId, 255, color);
 		}
 		else
 		{
@@ -255,11 +294,11 @@ public class GiveDyeListener extends PluginListener
 			{
 				if(temp - 64 >= 64)
 				{
-					entity.a(new jl(itemId, 64, color));
+					setEntity(player.getEntity(), itemId, 64, color);
 				}
 				else
 				{
-					entity.a(new jl(itemId, temp, color));
+					setEntity(player.getEntity(), itemId, temp, color);
 				}
 				temp -= 64;
 			} while (temp > 0);
@@ -326,4 +365,110 @@ public class GiveDyeListener extends PluginListener
 		
 		return null;
 	}
+	
+	private void spawnSheep(Player player, String[] args, int max, int prop)
+	{
+		int color = 0;
+		int amount = 1;
+		String rider = "";
+		
+		try
+		{
+			color = Integer.parseInt(args[1]);
+		}
+		catch(NumberFormatException e)
+		{
+			if(properties[prop].containsKey(args[1]))
+			{
+				color = properties[prop].getInt(args[1], -1);
+			}
+			else
+			{
+				color = -1;
+			}
+		}
+		
+		if(color < 0 || color > max)
+		{
+			player.sendMessage(Colors.Rose + "Improper color id.");
+			return;
+		}
+		
+		if(args.length > 2)
+		{
+			try
+			{
+				amount = Integer.parseInt(args[2]);
+			}
+			catch(NumberFormatException e)
+			{
+				player.sendMessage(Colors.Rose + "Improper amount.");
+				return;
+			}
+		}
+		
+		int maxSpawn = 256;
+		if(properties[prop].containsKey("spawnmob-max")) //added check to get around hMod's want to save missing settings
+			maxSpawn = properties[prop].getInt("spawnmob-max", maxSpawn);
+		
+		if (amount > maxSpawn)
+			amount = maxSpawn;
+		
+		if (amount <= 0)
+			return;
+		
+		
+		if(args.length > 3)
+		{
+			if(Mob.isValid(args[3]))
+			{
+				rider = args[3];
+			}
+			else
+			{
+				player.sendMessage(Colors.Rose + "Invalid rider. Name has to start with a capital like so: Pig");
+				return;
+			}
+		}
+		
+		
+		for(int i = 0; i < amount; i++)
+		{
+			Mob mob = new Mob("Sheep", player.getLocation() );
+			
+			if(rider.length() > 0)
+				mob.spawn(new Mob(rider));
+			else
+				mob.spawn();
+			
+			setSheep(mob.getEntity(), color);
+		}
+	}
+	
+	
+	private void setEntity(fy entity, int itemId, int amount, int color)
+	{
+		entity.a(new jl(itemId, amount, color));
+	}
+	
+	private void setSheep(mj entity, int color)
+	{
+		dv sheep = (dv)entity;
+		sheep.a(color);
+	}
+	
+	
+	
+	private void setEntity(OEntityPlayerMP entity, int itemId, int amount, int color)
+	{
+		entity.a(new OItemStack(itemId, amount, color));
+	}
+	
+	private void setSheep(OEntityLiving entity, int color)
+	{
+		OEntitySheep sheep = (OEntitySheep)entity;
+		sheep.a(color);
+	}
+	
+	
 }

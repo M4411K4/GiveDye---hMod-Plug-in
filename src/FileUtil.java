@@ -19,10 +19,12 @@ public class FileUtil
 		
 		"#To allow players to use this plug-in you must add the /givedye command to groups in the groups.txt server file.\r\n"+
 		"#If you want to allow a group to give other players dyes or wool, add the /givedyeto command to the group. \r\n"+
+		"#To allow a group to spawn colored sheep, add the /sheep command to the group. \r\n"+
 		"#In-game commands will be:\r\n"+
 		"#/dye [color id or name] <amount> <player>\r\n"+
 		"#/wool [color id or name] <amount> <player>\r\n"+
 		"#/log [color id or name] <amount> <player>\r\n"+
+		"#/sheep [color id or name] <amount>\r\n"+
 		"###################\r\n"+
 		"\r\n"+
 		"#Allow this plug-in to give out dyes? This applies to all players. If missing, this will be set to true. [default = true]\r\n"+
@@ -73,10 +75,12 @@ public class FileUtil
 		
 		"#To allow players to use this plug-in you must add the /givedye command to groups in the groups.txt server file.\r\n"+
 		"#If you want to allow a group to give other players dyes or wool, add the /givedyeto command to the group. \r\n"+
+		"#To allow a group to spawn colored sheep, add the /sheep command to the group. \r\n"+
 		"#In-game commands will be:\r\n"+
 		"#/dye [color id or name] <amount> <player>\r\n"+
 		"#/wool [color id or name] <amount> <player>\r\n"+
 		"#/log [color id or name] <amount> <player>\r\n"+
+		"#/sheep [color id or name] <amount>\r\n"+
 		"###################\r\n"+
 		"\r\n"+
 		"#Allow this plug-in to give out wool? This applies to all players. If missing, this will be set to true. [default = true]\r\n"+
@@ -85,9 +89,12 @@ public class FileUtil
 		"#Display server log messages when players get or give wools? If missing, this will be set to true. [default = true]\r\n"+
 		"log-giving=true\r\n"+
 		"\r\n"+
+		"#Max amount of sheep allowed to spawn per /sheep command. If missing, this will be set to 256. [default = 256]\r\n"+
+		"spawnmob-max=256\r\n"+
+		"\r\n"+
 		"###################\r\n"+
 		"\r\n"+
-		"#Wool Values:\r\n"+
+		"#Wool AND Sheep Values:\r\n"+
 		"\r\n"+
 		"#Add the wool color names you want followed by the color id number (0 to 15) to go with the name\r\n"+
 		"#format: [wool_name]=[color_id]\r\n"+
@@ -127,11 +134,16 @@ public class FileUtil
 		
 		"#To allow players to use this plug-in you must add the /givedye command to groups in the groups.txt server file.\r\n"+
 		"#If you want to allow a group to give other players dyes or wool, add the /givedyeto command to the group. \r\n"+
+		"#To allow a group to spawn colored sheep, add the /sheep command to the group. \r\n"+
 		"#In-game commands will be:\r\n"+
 		"#/dye [color id or name] <amount> <player>\r\n"+
 		"#/wool [color id or name] <amount> <player>\r\n"+
 		"#/log [color id or name] <amount> <player>\r\n"+
+		"#/sheep [color id or name] <amount>\r\n"+
 		"###################\r\n"+
+		"\r\n"+
+		"#The tool used to change leaf types. If missing or empty, this will be disabled! [default = 341 (slimeball)]\r\n"+
+		"leaf-tool=341\r\n"+
 		"\r\n"+
 		"#Allow this plug-in to give out logs? This applies to all players. If missing, this will be set to true. [default = true]\r\n"+
 		"allow-log=true\r\n"+
