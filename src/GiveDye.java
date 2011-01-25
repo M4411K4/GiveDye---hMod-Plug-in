@@ -7,7 +7,7 @@ public class GiveDye extends Plugin
 	public static final Logger log = Logger.getLogger("Minecraft");
 	
 	public final String NAME = "GiveDye";
-	public final String VERSION = "0.3";
+	public final String VERSION = "0.4";
 	
 	private GiveDyeListener listener;
 	private PropertiesFile[] properties;

@@ -11,6 +11,8 @@ public class GiveDyeListener extends PluginListener
 	private final String GIVE_DYE = "/givedye";
 	private final String GIVE_DYE_TO = "/givedyeto";
 	private final String SHEEP = "/sheep";
+	private final String LEAF_TOOL = "/leaftool";
+	private final String LOG_TOOL = "/logtool";
 	
 	private final int DYE_ID = 351;
 	private final int WOOL_ID = 35;
@@ -44,7 +46,8 @@ public class GiveDyeListener extends PluginListener
 		}
 		else if(player.canUseCommand(GIVE_DYE) || player.canUseCommand(GIVE_DYE_TO))
 		{
-			if(properties[0].getBoolean("allow-dye", true) && (split[0].equalsIgnoreCase(DYE) || split[0].equalsIgnoreCase(D)) )
+			if( (!properties[0].containsKey("allow-dye") || properties[0].getBoolean("allow-dye", true) ) &&
+					(split[0].equalsIgnoreCase(DYE) || split[0].equalsIgnoreCase(D)) )
 			{
 				if(split.length < 2)
 				{
@@ -57,7 +60,8 @@ public class GiveDyeListener extends PluginListener
 				
 				giveColor(player, DYE_ID, split, 15, 0);
 			}
-			else if(properties[1].getBoolean("allow-wool", true) && (split[0].equalsIgnoreCase(WOOL) || split[0].equalsIgnoreCase(W)) )
+			else if( (!properties[1].containsKey("allow-wool") || properties[1].getBoolean("allow-wool", true) ) &&
+					(split[0].equalsIgnoreCase(WOOL) || split[0].equalsIgnoreCase(W)) )
 			{
 				if(split.length < 2)
 				{
@@ -70,7 +74,8 @@ public class GiveDyeListener extends PluginListener
 				
 				giveColor(player, WOOL_ID, split, 15, 1);
 			}
-			else if(properties[2].getBoolean("allow-log", true) && (split[0].equalsIgnoreCase(LOG) || split[0].equalsIgnoreCase(L)) )
+			else if( (!properties[2].containsKey("allow-log") || properties[2].getBoolean("allow-log", true) ) &&
+					(split[0].equalsIgnoreCase(LOG) || split[0].equalsIgnoreCase(L)) )
 			{
 				if(split.length < 2)
 				{
@@ -110,28 +115,105 @@ public class GiveDyeListener extends PluginListener
 	
 	public boolean onBlockDestroy(Player player, Block block) 
 	{
-		setLeaf(player, block, 2);
+		if(!clickAllowed(player, block))
+			return false;
+		
+		if(setLeaf(player, block, 2))
+			return false;
+		
+		cycleBlock(player, block);
 		
 		return false;
 	}
 	
 	public void onBlockRightClicked(Player player, Block blockClicked, Item item)
 	{
+		if(!clickAllowed(player, blockClicked))
+			return;
+		
 		setLeaf(player, blockClicked, 1);
 	}
 	
-	private void setLeaf(Player player, Block block, int leafType)
+	/*
+	 * @return Returns true if leaf block was changed.
+	 */
+	private boolean setLeaf(Player player, Block block, int leafType)
 	{
-		if(block.getType() != LEAF_ID || (!player.canUseCommand(GIVE_DYE) && !player.canUseCommand(GIVE_DYE_TO)) )
+		if(block.getType() != LEAF_ID || block.getData() == leafType)
+			return false;
+		
+		int tool = -1;
+		try
+		{
+			if(properties[2].containsKey("leaf-tool"))
+				tool = properties[2].getInt("leaf-tool", -1);
+		}
+		catch(NumberFormatException e)
+		{
+			return false;
+		}
+		
+		int itemId = player.getItemInHand();
+		
+		if(tool < 0 || itemId != tool)
+			return false;
+		
+		etc.getServer().setBlockData(block.getX(), block.getY(), block.getZ(), leafType);
+		return true;
+	}
+	
+	private void cycleBlock(Player player, Block block)
+	{
+		if(block.getStatus() != 0)
 			return;
 		
-		int tool = properties[2].getInt("leaf-tool", -1);
 		int itemId = player.getItemInHand();
+		int tool = -1;
+		
+		try
+		{
+			if(block.getType() == LEAF_ID)
+			{
+				if(properties[2].containsKey("leaf-cycle-tool"))
+					tool = properties[2].getInt("leaf-cycle-tool", -1);
+			}
+			else if(block.getType() == LOG_ID)
+			{
+				if(properties[2].containsKey("log-cycle-tool"))
+					tool = properties[2].getInt("log-cycle-tool", -1);
+			}
+		}
+		catch(NumberFormatException e)
+		{
+			return;
+		}
 		
 		if(tool < 0 || itemId != tool)
 			return;
 		
-		etc.getServer().setBlockData(block.getX(), block.getY(), block.getZ(), leafType);
+		int blockType = block.getData() + 1;
+		
+		if(blockType > 2)
+			blockType = 0;
+		
+		etc.getServer().setBlockData(block.getX(), block.getY(), block.getZ(), blockType);
+	}
+	
+	private boolean clickAllowed(Player player, Block block)
+	{
+		if(block.getType() != LEAF_ID && block.getType() != LOG_ID)
+			return false;
+		
+		if( ( !player.canUseCommand(GIVE_DYE) && !player.canUseCommand(GIVE_DYE_TO) ) &&
+			( (block.getType() == LEAF_ID && !player.canUseCommand(LEAF_TOOL) ) ||
+			  (block.getType() == LOG_ID && !player.canUseCommand(LOG_TOOL) )
+			)
+		  )
+		{
+			return false;
+		}
+		
+		return true;
 	}
 	
 	//Mostly a copy of hMod Player and related code
@@ -194,7 +276,7 @@ public class GiveDyeListener extends PluginListener
 			
 			//[NOTE]: leaving out allowed item check since this is a plug-in that can be disabled if the items are not wanted
 			
-			if(properties[prop].getBoolean("log-giving", true))
+			if(!properties[prop].containsKey("log-cycle-tool") || properties[prop].getBoolean("log-giving", true))
 				GiveDye.log.info("Giving " + toGive.getName() + " some " + id + " with color " + color);
 			
 			Inventory inventory = toGive.getInventory();
@@ -445,7 +527,6 @@ public class GiveDyeListener extends PluginListener
 		}
 	}
 	
-	
 	private void setEntity(fy entity, int itemId, int amount, int color)
 	{
 		entity.a(new jl(itemId, amount, color));
@@ -458,7 +539,6 @@ public class GiveDyeListener extends PluginListener
 	}
 	
 	
-	
 	private void setEntity(OEntityPlayerMP entity, int itemId, int amount, int color)
 	{
 		entity.a(new OItemStack(itemId, amount, color));
@@ -469,6 +549,5 @@ public class GiveDyeListener extends PluginListener
 		OEntitySheep sheep = (OEntitySheep)entity;
 		sheep.a(color);
 	}
-	
 	
 }

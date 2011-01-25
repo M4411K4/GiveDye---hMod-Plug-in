@@ -145,6 +145,12 @@ public class FileUtil
 		"#The tool used to change leaf types. If missing or empty, this will be disabled! [default = 341 (slimeball)]\r\n"+
 		"leaf-tool=341\r\n"+
 		"\r\n"+
+		"#The tool used to cycle through leaf types. If missing or empty, this will be disabled! Disabled by default. \r\n"+
+		"leaf-cycle-tool=\r\n"+
+		"\r\n"+
+		"#The tool used to cycle through log/wood types. If missing or empty, this will be disabled! Disabled by default. \r\n"+
+		"log-cycle-tool=\r\n"+
+		"\r\n"+
 		"#Allow this plug-in to give out logs? This applies to all players. If missing, this will be set to true. [default = true]\r\n"+
 		"allow-log=true\r\n"+
 		"\r\n"+
