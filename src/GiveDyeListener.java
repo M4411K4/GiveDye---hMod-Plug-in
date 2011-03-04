@@ -527,18 +527,6 @@ public class GiveDyeListener extends PluginListener
 		}
 	}
 	
-	private void setEntity(fy entity, int itemId, int amount, int color)
-	{
-		entity.a(new jl(itemId, amount, color));
-	}
-	
-	private void setSheep(mj entity, int color)
-	{
-		dv sheep = (dv)entity;
-		sheep.a(color);
-	}
-	
-	
 	private void setEntity(OEntityPlayerMP entity, int itemId, int amount, int color)
 	{
 		entity.a(new OItemStack(itemId, amount, color));
@@ -547,7 +535,7 @@ public class GiveDyeListener extends PluginListener
 	private void setSheep(OEntityLiving entity, int color)
 	{
 		OEntitySheep sheep = (OEntitySheep)entity;
-		sheep.a(color);
+		sheep.a_(color);
 	}
 	
 }
